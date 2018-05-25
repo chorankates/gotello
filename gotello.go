@@ -112,7 +112,7 @@ func main() {
 	s := buildStatusPane(lines, columns)
 
 	// keyboard input handling
-	registerKeyboardInput()
+	registerKeyboardInput() // maybe we pass the drone object here
 
 	// render handling
 	draw := func(t int) {
