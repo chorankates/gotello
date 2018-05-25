@@ -5,7 +5,6 @@ import (
 	"time"
 	"sync"
 	"fmt"
-	"sort"
 )
 
 type log struct {
@@ -42,58 +41,6 @@ func getScreenSize() (lines int, columns int) {
 
 	return
 }
-
-func getLogPaneContents(rows int) (result []string) {
-
-	l.Unlock()
-	//result = l.log[:rows] // TODO why doesn't this work?
-
-	total := len(l.log) - 1
-
-	for i := 0; i < rows && i < total; i++ {
-		result = append(result, l.log[total - i])
-	}
-
-	l.Lock()
-
-	return
-}
-
-func getStatusPaneContents() (result []string) {
-	m := map[string]string {
-		"status": "disconnected", // (disconnected, connected/landed, flying)
-		"ground speed": "0.0",
-		"rotor speed": "0.0",
-		"battery %": "0.00%", // want this to be a bar graph eventually
-		"battery left": "0s",
-	}
-
-	// i do not like this. i would very much like to just sort on the keys during the appending
-	var keys []string
-
-	for k := range m {
-		keys = append(keys, k)
-	}
-
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		result = append(result, fmt.Sprintf("%s: [%s]", key, m[key]))
-	}
-
-	return
-}
-
-func sendCommand(command string) {
-
-	l.addLog(command)
-
-	//switch command {
-	//case "look_up":
-	//	// TODO ... going to need a handle on the drone itself.. given how we're registering, probably need it to be global
-	//}
-}
-
 
 func main() {
 	initLog()
