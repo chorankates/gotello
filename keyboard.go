@@ -6,13 +6,13 @@ import (
 
 // TODO really don't like how manual this is
 func getKeyboardMap() (result string) {
-	result = `
-key		command			key		command
+	result = `key		command			key		command
 w		turn_up			s		turn_down
 a		turn_left		d		turn_right
 <up>	fly_up			<down>	fly_down
 <left>	fly_left		<right>	fly_right
 c		start camera	C		stop camera
++		zoom_in			-		zoom_out
 <enter> takeoff <t>		q		quit
 `
 	return
@@ -43,6 +43,14 @@ func registerKeyboardInput() {
 
 	ui.Handle("/sys/kbd/<right>", func(ui.Event) {
 		sendCommand("fly_right")
+	})
+
+	ui.Handle("/sys/kbd/+", func(ui.Event) {
+		sendCommand("zoom_in")
+	})
+
+	ui.Handle("/sys/kbd/-", func(ui.Event) {
+		sendCommand("zoom_out")
 	})
 
 	// TODO or should this be a toggle as well?
