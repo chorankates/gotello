@@ -69,7 +69,7 @@ func buildAltitudeGaugePane(lines int, columns int) *ui.Gauge {
 	a.BorderLabel = "altitude"
 	a.BorderFg = ui.ColorWhite
 	a.X = a.Width
-	a.Y = lines - a.Height * 7
+	a.Y = lines - a.Height * 7 + 3
 	
 	a.Handle("/timer/1s", func(e ui.Event) {
 		a.Percent = getAltitudePercentage()
@@ -92,7 +92,7 @@ func buildBatteryGaugePane(lines int, columns int) *ui.Gauge {
 	g.BorderLabel = "battery"
 	g.BorderFg = ui.ColorWhite
 	g.X = g.Width // align to center
-	g.Y = lines - g.Height * 6
+	g.Y = lines - g.Height * 6 + 3
 
 	g.Percent = 0
 
@@ -121,7 +121,7 @@ func buildGroundSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	gs.BorderLabel = "ground speed"
 	gs.BorderFg = ui.ColorWhite
 	gs.X = gs.Width
-	gs.Y = lines - gs.Height * 4
+	gs.Y = lines - gs.Height * 4 + 3
 
 	gs.Percent = 0
 
@@ -142,6 +142,49 @@ func buildGroundSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	return gs
 }
 
+func buildFlightStatusPanel(lines int, columns int) *ui.Par {
+	l.addLog("building FlightStatus panel")
+
+	fs := ui.NewPar("flight status")
+	fs.Height = int(float64(lines) * 0.1)
+	fs.Width = columns / 2
+	fs.BorderLabel = "flight status"
+	fs.BorderFg = ui.ColorWhite
+	fs.X = fs.Width
+	fs.Y = lines - fs.Height * 8 + 3
+
+	fs.Text = "disconnected"
+
+	fs.Handle("/timer/1s", func(e ui.Event) {
+		status := getFlightStatus()
+
+		fs.Text = status
+
+		switch status {
+		case "disconnected":
+			fs.TextFgColor = ui.ColorWhite
+		case "connected":
+			fs.TextFgColor = ui.ColorYellow
+		case "flying":
+			fs.TextFgColor = ui.ColorGreen
+		}
+
+	})
+
+	return fs
+
+}
+
+func getFlightStatus() (result string) {
+	statuses := []string{
+		"disconnected",
+		"connected",
+		"flying",
+	}
+
+	return statuses[rand.Intn(len(statuses))]
+}
+
 func getGroundSpeedPercentage() (result int) {
 	// TODO use a constant to define the max speed
 	result = rand.Intn(100)
@@ -157,7 +200,7 @@ func buildRotorSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	rs.BorderLabel = "rotor speed"
 	rs.BorderFg = ui.ColorWhite
 	rs.X = rs.Width
-	rs.Y = lines - rs.Height * 5
+	rs.Y = lines - rs.Height * 5 + 3
 
 	rs.Percent = 0
 

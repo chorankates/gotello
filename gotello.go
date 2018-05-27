@@ -62,6 +62,7 @@ func main() {
 	c := buildConsolePane(lines, columns)
 	ll := buildLogPane(lines, columns)
 	s := buildStatusPane(lines, columns)
+	fs := buildFlightStatusPanel(lines, columns)
 	a := buildAltitudeGaugePane(lines, columns)
 	g := buildBatteryGaugePane(lines, columns)
 	gs := buildGroundSpeedGaugePane(lines, columns)
@@ -73,7 +74,7 @@ func main() {
 
 	// render handling
 	draw := func(t int) {
-		ui.Render(c, ll, s, a, g, gs, rs)
+		ui.Render(c, ll, s, fs, a, g, gs, rs)
 	}
 
 	ui.Handle("/timer/1s", func(e ui.Event) {
