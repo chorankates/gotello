@@ -5,6 +5,7 @@ import (
 	"time"
 	"sync"
 	"fmt"
+	"gobot.io/x/gobot"
 )
 
 type log struct {
@@ -23,9 +24,11 @@ func (l *log) addLog(s string) {
 }
 
 var l log
+var d gobot.Robot
 
-func initLog() {
+func initialize() {
 	l.Lock() // not sure why this isn't the default state
+	d = *initTello()
 }
 
 func getScreenSize() (lines int, columns int) {
@@ -43,7 +46,7 @@ func getScreenSize() (lines int, columns int) {
 }
 
 func main() {
-	initLog()
+	initialize()
 	//initTello()
 
 	if err := ui.Init(); err != nil {
@@ -52,18 +55,25 @@ func main() {
 	defer ui.Close()
 
 	lines, columns := getScreenSize()
+	l.addLog(fmt.Sprintf("found screen size to be %dx%d", lines, columns))
 
 	// pane generation
+	l.addLog("building panes..")
 	c := buildConsolePane(lines, columns)
-	l := buildLogPane(lines, columns)
+	ll := buildLogPane(lines, columns)
 	s := buildStatusPane(lines, columns)
+	a := buildAltitudeGaugePane(lines, columns)
+	g := buildBatteryGaugePane(lines, columns)
+	gs := buildGroundSpeedGaugePane(lines, columns)
+	rs := buildRotorSpeedGaugePane(lines, columns)
 
 	// keyboard input handling
+	l.addLog("registering keuboard handlers..")
 	registerKeyboardInput() // maybe we pass the drone object here
 
 	// render handling
 	draw := func(t int) {
-		ui.Render(c, l, s)
+		ui.Render(c, ll, s, a, g, gs, rs)
 	}
 
 	ui.Handle("/timer/1s", func(e ui.Event) {
@@ -72,5 +82,6 @@ func main() {
 	})
 	
 	// 'main()'
+	l.addLog("starting the render loop..")
 	ui.Loop()
 }
