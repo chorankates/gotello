@@ -30,7 +30,7 @@ func buildLogPane(lines int, columns int) *ui.List {
 	
 	// TODO this should be a real timestamp
 	ll := ui.NewList()
-	ll.Height = int(float64(lines) * 0.8)
+	ll.Height = int(float64(lines) * 0.8) + 1
 	ll.Width = columns / 2
 	ll.BorderLabel = "log"
 	ll.BorderFg = ui.ColorWhite

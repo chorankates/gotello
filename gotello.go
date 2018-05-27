@@ -17,7 +17,7 @@ func (l *log) addLog(s string) {
 	l.Unlock()
 	l.log = append(
 		l.log,
-		fmt.Sprintf("[%s] - [%s]",
+		fmt.Sprintf("%s: [%s]",
 			time.Now().Format("03:04.05"), // 01/02 03:04:05PM '06 -0700
 			s))
 	l.Lock()
