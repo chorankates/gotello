@@ -7,17 +7,19 @@ import (
 	"fmt"
 )
 
-// TODO really don't like how manual this is
-func getKeyboardMap() (result string) {
-	result = `key		command			key		command
-w		turn_up			s		turn_down
-a		turn_left		d		turn_right
-<up>	fly_up			<down>	fly_down
-<left>	fly_left		<right>	fly_right
-c		start camera	C		stop camera
-+		zoom_in			-		zoom_out
-<enter> takeoff <t>		q		quit
-`
+
+func getKeyboardMap() (result []string) {
+	result = []string{
+		fmt.Sprintf("key        command       key       command"),
+		//fmt.Sprintf("w          turn_up       s       turn_down"),
+		fmt.Sprintf("a          turn_left     d         turn_right"),
+		fmt.Sprintf("<up>       fly_up        <down>    fly_down"),
+		fmt.Sprintf("<left>     fly_left      <right>   fly_right"),
+		fmt.Sprintf("<c>        start_camera   C        stop_camera"),
+		fmt.Sprintf("+          zoom_in        -        zoom_out"),
+		fmt.Sprintf("<enter>    takeoff <t>    q        quit"),
+	}
+
 	return
 }
 
@@ -92,6 +94,10 @@ func registerKeyboardInput() {
 	// navigation / otherwise
 	ui.Handle("/sys/kbd/q", func(ui.Event) {
 		ui.StopLoop()
+	})
+
+	ui.Handle("/sys/kbd/p", func(ui.Event) {
+		// TODO how do we pause the loop?
 	})
 
 }
