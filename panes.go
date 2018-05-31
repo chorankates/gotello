@@ -6,21 +6,21 @@ import (
 	"math/rand"
 )
 
+// primary panes
+
 // TODO if this just holds control information, shouldn't it be 'help' and toggle-able
-func buildConsolePane(lines int, columns int) *ui.Par {
+func buildConsolePane(lines int, columns int) *ui.List {
 	l.addLog("building Console pane")
-	c := ui.NewPar("gotello 0.1 - basic control for Tello")
+	c := ui.NewList()
 	c.Height = int(float64(lines) * 0.2)
 	c.Width = columns
 
-	c.TextFgColor = ui.ColorWhite
 	c.BorderLabel = "console"
 	c.BorderFg = ui.ColorWhite
 
 	c.Y = lines - c.Height // align to the bottom
 
-	c.Text = getKeyboardMap()
-	//c.Text = getKeyboardMapBetter()
+	c.Items = getKeyboardMap()
 
 	return c
 }
@@ -60,6 +60,71 @@ func buildStatusPane(lines int, columns int) *ui.List {
 	return s
 }
 
+// ~bar panes
+
+func buildFlightStatusPanel(lines int, columns int) *ui.Par {
+	l.addLog("building FlightStatus panel")
+
+	fs := ui.NewPar("flight status")
+	fs.Height = int(float64(lines) * 0.1)
+	fs.Width = columns / 2
+	fs.BorderLabel = "flight status"
+	fs.BorderFg = ui.ColorWhite
+	fs.X = fs.Width
+	fs.Y = lines - fs.Height * 9 + 3
+
+	fs.Text = "disconnected"
+
+	fs.Handle("/timer/1s", func(e ui.Event) {
+		status := getFlightStatus()
+
+		fs.Text = status
+
+		switch status {
+		case "disconnected":
+			fs.TextFgColor = ui.ColorWhite
+		case "connected":
+			fs.TextFgColor = ui.ColorYellow
+		case "flying":
+			fs.TextFgColor = ui.ColorGreen
+		}
+
+	})
+
+	return fs
+
+}
+
+func buildSignalGaugePane(lines int, columns int) *ui.Gauge {
+	l.addLog("building Signal gauge")
+
+	s := ui.NewGauge()
+	s.Height = int(float64(lines) * 0.1)
+	s.Width = columns / 2
+	s.BorderLabel = "signal strength"
+	s.BorderFg = ui.ColorWhite
+	s.X = s.Width
+	s.Y = lines - s.Height * 8 + 3
+
+	s.Percent = 0
+
+	s.Handle("/timer/1s", func(e ui.Event) {
+		pct := getSignalPercentage()
+
+		s.Percent = pct
+
+		if (pct > 66) && (pct <= 100) {
+			s.BarColor = ui.ColorGreen
+		} else if (pct > 33)  && pct <= 66 {
+			s.BarColor = ui.ColorYellow
+		} else {
+			s.BarColor = ui.ColorRed
+		}
+	})
+
+	return s
+}
+
 func buildAltitudeGaugePane(lines int, columns int) *ui.Gauge {
 	l.addLog("building Altitude gauge")
 
@@ -76,11 +141,6 @@ func buildAltitudeGaugePane(lines int, columns int) *ui.Gauge {
 	})
 
 	return a
-}
-
-func getAltitudePercentage() (result int) {
-	result = rand.Intn(100)
-	return
 }
 
 func buildBatteryGaugePane(lines int, columns int) *ui.Gauge {
@@ -142,55 +202,6 @@ func buildGroundSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	return gs
 }
 
-func buildFlightStatusPanel(lines int, columns int) *ui.Par {
-	l.addLog("building FlightStatus panel")
-
-	fs := ui.NewPar("flight status")
-	fs.Height = int(float64(lines) * 0.1)
-	fs.Width = columns / 2
-	fs.BorderLabel = "flight status"
-	fs.BorderFg = ui.ColorWhite
-	fs.X = fs.Width
-	fs.Y = lines - fs.Height * 8 + 3
-
-	fs.Text = "disconnected"
-
-	fs.Handle("/timer/1s", func(e ui.Event) {
-		status := getFlightStatus()
-
-		fs.Text = status
-
-		switch status {
-		case "disconnected":
-			fs.TextFgColor = ui.ColorWhite
-		case "connected":
-			fs.TextFgColor = ui.ColorYellow
-		case "flying":
-			fs.TextFgColor = ui.ColorGreen
-		}
-
-	})
-
-	return fs
-
-}
-
-func getFlightStatus() (result string) {
-	statuses := []string{
-		"disconnected",
-		"connected",
-		"flying",
-	}
-
-	return statuses[rand.Intn(len(statuses))]
-}
-
-func getGroundSpeedPercentage() (result int) {
-	// TODO use a constant to define the max speed
-	result = rand.Intn(100)
-	return
-}
-
 func buildRotorSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	l.addLog("building RotorSpeed gauge")
 
@@ -221,8 +232,24 @@ func buildRotorSpeedGaugePane(lines int, columns int) *ui.Gauge {
 	return rs
 }
 
-func getRotorSpeedPerentage() (result int) {
-	// TODO use a constant to define the max speed
+// populate the bar graphs
+
+func getFlightStatus() (result string) {
+	statuses := []string{
+		"disconnected",
+		"connected",
+		"flying",
+	}
+
+	return statuses[rand.Intn(len(statuses))]
+}
+
+func getSignalPercentage() (result int) {
+	result = rand.Intn(100)
+	return
+}
+
+func getAltitudePercentage() (result int) {
 	result = rand.Intn(100)
 	return
 }
@@ -237,6 +264,19 @@ func getBatteryPercentage() (result int) {
 	result = rand.Intn(100)
 	return
 }
+
+func getRotorSpeedPerentage() (result int) {
+	// TODO use a constant to define the max speed
+	result = rand.Intn(100)
+	return
+}
+
+func getGroundSpeedPercentage() (result int) {
+	// TODO use a constant to define the max speed
+	result = rand.Intn(100)
+	return
+}
+
 
 func getLogPaneContents(rows int) (result []string) {
 
@@ -258,6 +298,7 @@ func getStatusPaneContents() (result []string) {
 
 	result = []string{
 		fmt.Sprintf("status:       [%v]", status.Status),
+		fmt.Sprintf("signal:       [%v]", status.Signal),
 		fmt.Sprintf("altitude:     [%v]", status.Altitude),
 		fmt.Sprintf("heading:      [%v]", status.Heading),
 		fmt.Sprintf("ground speed: [%v]", status.GroundSpeed),

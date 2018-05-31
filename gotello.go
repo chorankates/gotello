@@ -67,6 +67,7 @@ func main() {
 	g := buildBatteryGaugePane(lines, columns)
 	gs := buildGroundSpeedGaugePane(lines, columns)
 	rs := buildRotorSpeedGaugePane(lines, columns)
+	ss := buildSignalGaugePane(lines, columns)
 
 	// keyboard input handling
 	l.addLog("registering keuboard handlers..")
@@ -74,7 +75,7 @@ func main() {
 
 	// render handling
 	draw := func(t int) {
-		ui.Render(c, ll, s, fs, a, g, gs, rs)
+		ui.Render(c, ll, s, fs, a, g, gs, rs, ss)
 	}
 
 	ui.Handle("/timer/1s", func(e ui.Event) {
