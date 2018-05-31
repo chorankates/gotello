@@ -12,6 +12,7 @@ type Drone struct {
 	// and we also need to redirect the consoloe output it's doing through it's logger to ours
 
 	Status string
+	Signal float32
 	Altitude float32
 	Heading float32
 	GroundSpeed float32
@@ -27,6 +28,7 @@ func getStatus() (status Drone) {
 	status = *new(Drone)
 
 	status.Status = "disconnected"
+	status.Signal = 0
 	status.Altitude = 0
 	status.Heading = 0
 	status.GroundSpeed = 0
